@@ -1,0 +1,210 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// User role: ADMIN, DOCTOR, NURSE, RECEPTIONIST, PHARMACIST, LAB_TECH
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("RECEPTIONIST")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Gender: MALE, FEMALE, OTHER
+model Patient {
+  id             Int            @id @default(autoincrement())
+  patientId      String         @unique
+  firstName      String
+  lastName       String
+  dateOfBirth    DateTime
+  gender         String
+  phone          String
+  email          String?
+  address        String?
+  bloodGroup     String?
+  allergies      String?
+  medicalHistory String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  appointments   Appointment[]
+  labReports     LabReport[]
+  prescriptions  Prescription[]
+  billings       Billing[]
+  vitals         Vitals[]
+}
+
+// Status: ACTIVE, ON_LEAVE, INACTIVE
+model Doctor {
+  id              Int            @id @default(autoincrement())
+  doctorId        String         @unique
+  firstName       String
+  lastName        String
+  specialization  String
+  phone           String
+  email           String         @unique
+  qualification   String?
+  consultationFee Float          @default(0)
+  status          String         @default("ACTIVE")
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  appointments    Appointment[]
+  labReports      LabReport[]
+  prescriptions   Prescription[]
+}
+
+// Status: SCHEDULED, IN_PROGRESS, COMPLETED, CANCELLED
+// Type: CHECKUP, FOLLOW_UP, EMERGENCY, CONSULTATION
+model Appointment {
+  id            Int      @id @default(autoincrement())
+  appointmentId String   @unique
+  patientId     Int
+  doctorId      Int
+  dateTime      DateTime
+  status        String   @default("SCHEDULED")
+  type          String   @default("CHECKUP")
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  patient       Patient  @relation(fields: [patientId], references: [id])
+  doctor        Doctor   @relation(fields: [doctorId], references: [id])
+}
+
+// Status: PENDING, IN_PROGRESS, COMPLETED
+model LabReport {
+  id              Int      @id @default(autoincrement())
+  reportId        String   @unique
+  patientId       Int
+  doctorId        Int
+  testName        String
+  testDescription String?
+  result          String?
+  status          String   @default("PENDING")
+  testDate        DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  patient         Patient  @relation(fields: [patientId], references: [id])
+  doctor          Doctor   @relation(fields: [doctorId], references: [id])
+}
+
+model Medicine {
+  id                Int                @id @default(autoincrement())
+  name              String
+  manufacturer      String?
+  category          String?
+  price             Float              @default(0)
+  stock             Int                @default(0)
+  expiryDate        DateTime?
+  description       String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  prescriptionItems PrescriptionItem[]
+}
+
+model Prescription {
+  id             Int                @id @default(autoincrement())
+  prescriptionId String             @unique
+  patientId      Int
+  doctorId       Int
+  diagnosis      String?
+  notes          String?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  patient        Patient            @relation(fields: [patientId], references: [id])
+  doctor         Doctor             @relation(fields: [doctorId], references: [id])
+  items          PrescriptionItem[]
+}
+
+model PrescriptionItem {
+  id             Int          @id @default(autoincrement())
+  prescriptionId Int
+  medicineId     Int
+  dosage         String
+  frequency      String
+  duration       Int
+  instructions   String?
+  prescription   Prescription @relation(fields: [prescriptionId], references: [id])
+  medicine       Medicine     @relation(fields: [medicineId], references: [id])
+}
+
+// Status: PENDING, PARTIAL, PAID, CANCELLED
+// PaymentMethod: CASH, CARD, UPI, INSURANCE
+model Billing {
+  id            Int           @id @default(autoincrement())
+  invoiceId     String        @unique
+  patientId     Int
+  totalAmount   Float         @default(0)
+  paidAmount    Float         @default(0)
+  status        String        @default("PENDING")
+  paymentMethod String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  patient       Patient       @relation(fields: [patientId], references: [id])
+  items         BillingItem[]
+}
+
+// Type: CONSULTATION, LAB_TEST, MEDICINE, PROCEDURE, OTHER
+model BillingItem {
+  id          Int    @id @default(autoincrement())
+  billingId   Int
+  description String
+  amount      Float
+  quantity    Int    @default(1)
+  type        String @default("OTHER")
+  billing     Billing @relation(fields: [billingId], references: [id])
+}
+
+// Type: APPOINTMENT_REMINDER, LOW_STOCK, LAB_RESULT, BILLING_DUE, SYSTEM
+// Priority: LOW, NORMAL, HIGH, URGENT
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  title     String
+  message   String
+  type      String   @default("SYSTEM")
+  priority  String   @default("NORMAL")
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+}
+
+// Action: CREATE, UPDATE, DELETE, LOGIN, LOGOUT, PASSWORD_CHANGE
+model AuditLog {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  userName     String
+  action       String
+  resourceType String
+  resourceId   String?
+  details      String?
+  ipAddress    String?
+  createdAt    DateTime @default(now())
+}
+
+model Settings {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String
+  category  String   @default("SYSTEM")
+  updatedAt DateTime @updatedAt
+}
+
+model Vitals {
+  id          Int      @id @default(autoincrement())
+  patientId   Int
+  temperature Float
+  bloodPress  String
+  pulseRate   Int
+  spo2        Int
+  weight      Float?
+  recordedBy  String
+  createdAt   DateTime @default(now())
+  patient     Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+}

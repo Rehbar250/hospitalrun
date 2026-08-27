@@ -1,0 +1,31 @@
+{
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "eslint.enable": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "eslint.workingDirectories": [
+    {
+      "directory": "packages/components",
+      "changeProcessCWD": true
+    },
+    {
+      "directory": "packages/core",
+      "changeProcessCWD": true
+    },
+    {
+      "directory": "packages/frontend",
+      "changeProcessCWD": true
+    },
+    {
+      "directory": "packages/server",
+      "changeProcessCWD": true
+    }
+  ]
+}
