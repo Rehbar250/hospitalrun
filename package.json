@@ -12,7 +12,7 @@
     "db:seed": "cd server && npx prisma db seed",
     "db:studio": "cd server && npx prisma studio",
     "build": "cd server && npx prisma generate && cd ../frontend && npm run build",
-    "vercel-build": "cd server && npm install && npx prisma db push --accept-data-loss && node prisma/seed.js && cd ../frontend && npm install && npm run build"
+    "vercel-build": "cd server && npm install && node -e \"if(!require('fs').existsSync('.env')) require('fs').writeFileSync('.env', 'DATABASE_URL=\\\"file:./dev.db\\\"\\nJWT_SECRET=\\\"hospitalrun-secret-key-prod\\\"\\n')\" && npx prisma db push --accept-data-loss && node prisma/seed.js && cd ../frontend && npm install && npm run build"
   },
   "dependencies": {
     "@prisma/client": "^6.9.0",
