@@ -1,130 +1,329 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/HospitalRun/design/master/logo/horizontal/logo-on-transparent.png" alt="HospitalRun logo"/>
+# 🏥 HospitalRun
 
-![Last commit](https://img.shields.io/github/last-commit/hospitalrun/hospitalrun) [![GitHub CI](https://github.com/HospitalRun/hospitalrun/workflows/GitHub%20CI/badge.svg)](https://github.com/HospitalRun/hospitalrun/actions) [![Documentation Status](https://readthedocs.org/projects/hospitalrun/badge/?version=latest)](https://docs.hospitalrun.io) ![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg) ![License](https://img.shields.io/github/license/hospitalrun/hospitalrun) [![Slack](https://hospitalrun-slack.herokuapp.com/badge.svg)](https://hospitalrun-slack.herokuapp.com) ![License](https://img.shields.io/github/license/hospitalrun/hospitalrun) [![OpenUK](https://img.shields.io/badge/OpenUK%20Awards%202020-OSS%20Winner-blue)](https://openuk.uk/awards/)
+**Next-Generation Open Source Hospital Information & Healthcare Management System (HIS/EHR)**
 
-<hr />
+[![React Version](https://img.shields.io/badge/React-19.0.0-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-8.x-646CFF?logo=vite&logoColor=white)](https://vite.dev/)
+[![Node.js](https://img.shields.io/badge/Node.js-%3E%3D18.0.0-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express-4.21.x-000000?logo=express&logoColor=white)](https://expressjs.com/)
+[![Prisma](https://img.shields.io/badge/Prisma-6.x-2D3748?logo=prisma&logoColor=white)](https://www.prisma.io/)
+[![SQLite](https://img.shields.io/badge/Database-SQLite-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+<p align="center">
+  A modern, responsive, and AI-assisted hospital management platform engineered for clinicians, administrators, pharmacists, and lab technicians. Built with offline-first and low-resource environment resilience in mind.
+</p>
+
 </div>
 
-All **HospitalRun** code lives in a single repository, an architecture generally called a monorepo. This repository holds all of HospitalRun's open source projects that lived in their own separate Github repos: [frontend](https://github.com/HospitalRun/hospitalrun-frontend), [server](https://github.com/HospitalRun/hospitalrun-server) and [components](https://github.com/HospitalRun/components).
-Built with React, Node, PouchDB/CouchDB and using offline first design, we're working to deliver an HIS system that makes usability the #1 requirement, is built specifically for developing world requirements, and seeks to give back time to patient care.
+---
 
-**<h3>‼️ Version 1.0.0-beta is no longer supported. Version 2 is currently under development ‼️</h3>**
+## 📖 Table of Contents
 
-# FAQs
+- [Overview](#-overview)
+- [Key Features](#-key-features)
+- [AI Clinical Intelligence Suite](#-ai-clinical-intelligence-suite)
+- [System Architecture](#-system-architecture)
+- [Project Directory Structure](#-project-directory-structure)
+- [Getting Started & Quick Setup](#-getting-started--quick-setup)
+- [Default Login Credentials](#-default-login-credentials)
+- [Role-Based Access Control (RBAC)](#-role-based-access-control-rbac)
+- [API Reference](#-api-reference)
+- [Available Scripts](#-available-scripts)
+- [Contributing](#-contributing)
+- [License](#-license)
 
-| Question                                                                   | Answer                                                                                                          |
-| -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| "I want to help"                                                           | [Find out how](#contributing)                                  |
-| "I have a question"                                                        | [Join our Slack Workspace](#community)                                          |
-| "I found a bug"                                                            | [Open an issue](https://github.com/HospitalRun/hospitalrun/issues/new/choose)                                   |
-| "How can I deploy 1.0.0-beta?"                                             | [Follow this guide](http://eepurl.com/c7uKJ5)                                                                   |
+---
 
-# Table of Contents
+## 🌟 Overview
 
-- [Staging Area](#staging-area)
-- [Contributing](#contributing)
-- [Community](#community)
-- [Project Structure](#project-structure)
-- [Application Infrastructure](#application-infrastructure)
-- [Behind HospitalRun](#behind-hospitalRun)
-- [License](#license)
+**HospitalRun** is an intuitive, fast, and feature-rich Hospital Information System (HIS) designed to streamline clinical workflows and eliminate administrative overhead. 
 
-# Staging Area
+From patient registration and appointment scheduling to electronic prescriptions, inventory control, automated billing, and real-time clinical decision support, HospitalRun equips healthcare providers with an all-in-one digital operating system.
 
-You can follow developments by visiting the dedicated [staging environment](https://staging.hospitalrun.io). Use `username` / `password` as credentials to access.
+---
 
-# Contributing
+## ✨ Key Features
 
-Interested in contributing to HospitalRun? There are many ways that you can get involved:
-- Try the [application](https://staging.hospitalrun.io)
-- Request [new features](https://github.com/HospitalRun/hospitalrun/issues/new?template=feature.md) and [report bugs](https://github.com/HospitalRun/hospitalrun/issues/new?template=bug.md)
-- Write [project documentation](https://hospitalrun.readthedocs.io/)
-- Contribute to the [source code](https://github.com/HospitalRun/hospitalrun/blob/master/.github/CONTRIBUTING.md)
-- [Sponsor the project](https://opencollective.com/hospitalrun/contribute/sponsors-336/checkout)
-- Translate text in the [application](https://staging.hospitalrun.io)
+### 👥 1. Comprehensive Patient & Vitals Records
+- **Electronic Health Records (EHR)**: Manage patient demographics, contact details, blood groups, known allergies, and medical history.
+- **Vitals Monitoring**: Record and track historical vitals—Body Temperature, Blood Pressure, Pulse Rate, Respiratory Rate, Oxygen Saturation ($SpO_2$), and Weight.
+- **Patient Detail Dashboard**: Integrated chronological views of appointments, diagnoses, lab investigations, prescribed medicines, and invoices.
 
-# Community
+### 📅 2. Smart Scheduling & Appointments
+- **Lifecycle Management**: Track visits through `SCHEDULED` ➡️ `IN_PROGRESS` ➡️ `COMPLETED` / `CANCELLED`.
+- **Intelligent Rescheduling**: Update date, time, and assigned physician while appending audit remarks and resetting status.
+- **Quick Next Follow-Up**: Instantly schedule follow-up visits pre-filled with the current doctor and patient record.
+- **Unified Multi-Field Search**: Search appointments in real-time by patient name, patient ID, doctor name, or appointment code.
 
-Join HospitalRun's community for discussion and ask questions: [HospitalRun's Slack Workspace](https://hospitalrun-slack.herokuapp.com)
+### 👨‍⚕️ 3. Doctor & Clinical Management
+- Maintain physician profiles, department specializations, qualifications, contact details, consultation fees, and operational availability (`ACTIVE` / `ON_LEAVE` / `INACTIVE`).
 
-Channels :
-- **#general** - For general purpose 
-- **#contributors** - For people who contribute to HospitalRun by developing features
-- **#troubleshooting** - For software related issues
+### 🧪 4. Laboratory Diagnostics
+- Monitor diagnostic tests across their lifecycle (`PENDING` ➡️ `IN_PROGRESS` ➡️ `COMPLETED`).
+- Detailed diagnostic test descriptions, attached physician orders, and structured test results entry.
 
-# Project Structure
+### 💊 5. Pharmacy & Inventory Control
+- Full medicine catalog tracking stock levels, unit pricing, batch numbers, manufacturer info, and expiration dates.
+- **Automated Low-Stock Alerts**: Real-time warnings when inventory levels fall below threshold.
 
-| Submodules                                                      | Version | Progress status                                                      | Build status                                                                                                                                             | Coverage status                                                                                                                                                                              | Code quality                                                                                                                                                                                                                 |
-| --------------------------------------------------------------- | --- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Frontend](https://github.com/HospitalRun/hospitalrun-frontend) | ![GitHub tag (latest SemVer pre-release)](https://img.shields.io/github/v/tag/hospitalrun/hospitalrun-frontend?include_prereleases) | ![Status](https://img.shields.io/badge/Status-developing-brightgree) | [![GitHub CI](https://github.com/HospitalRun/frontend/workflows/GitHub%20CI/badge.svg)](https://github.com/HospitalRun/frontend/actions)                 | [![Coverage Status](https://coveralls.io/repos/github/HospitalRun/hospitalrun-frontend/badge.svg?branch=master)](https://coveralls.io/github/HospitalRun/hospitalrun-frontend?branch=master) | [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/HospitalRun/hospitalrun-frontend.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/HospitalRun/hospitalrun-frontend/context:javascript) |
-| [Server](https://github.com/HospitalRun/hospitalrun-server)     | ![GitHub tag (latest SemVer pre-release)](https://img.shields.io/github/v/tag/hospitalrun/hospitalrun-server?include_prereleases) | ![Status](https://img.shields.io/badge/Status-developing-brightgree) | [![GitHub CI](https://github.com/HospitalRun/server/workflows/GitHub%20CI/badge.svg)](https://github.com/HospitalRun/server/actions)                     | [![Coverage Status](https://coveralls.io/repos/github/HospitalRun/hospitalrun-server/badge.svg?branch=master)](https://coveralls.io/github/HospitalRun/hospitalrun-server?branch=master)     | [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/HospitalRun/hospitalrun-server.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/HospitalRun/hospitalrun-server/context:javascript)     |
-| [Components](https://github.com/HospitalRun/components)         | ![GitHub tag (latest SemVer pre-release)](https://img.shields.io/github/v/tag/hospitalrun/components?include_prereleases) | ![Status](https://img.shields.io/badge/Status-developing-brightgree) | [![GitHub CI](https://github.com/HospitalRun/components/workflows/GitHub%20CI/badge.svg)](https://github.com/HospitalRun/components/actions)             | [![Coverage Status](https://coveralls.io/repos/github/HospitalRun/components/badge.svg?branch=master)](https://coveralls.io/github/HospitalRun/components?branch=master)                     | [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/HospitalRun/components.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/HospitalRun/components/context:javascript)                     |
-| [Core](https://github.com/HospitalRun/hospitalrun-core)         | ![GitHub tag (latest SemVer pre-release)](https://img.shields.io/github/v/tag/hospitalrun/hospitalrun-core?include_prereleases) | ![Status](https://img.shields.io/badge/Status-developing-brightgree) | [![GitHub CI](https://github.com/HospitalRun/hospitalrun-core/workflows/GitHub%20CI/badge.svg)](https://github.com/HospitalRun/hospitalrun-core/actions) |         | [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/HospitalRun/hospitalrun-core.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/HospitalRun/hospitalrun-core/context:javascript)         |
-| [CLI](https://github.com/HospitalRun/cli)                       | ![GitHub tag (latest SemVer pre-release)](https://img.shields.io/github/v/tag/hospitalrun/cli?include_prereleases) | ![Status](https://img.shields.io/badge/Status-developing-brightgree) | [![GitHub CI](https://github.com/HospitalRun/cli/workflows/GitHub%20CI/badge.svg)](https://github.com/HospitalRun/cli/actions)                           | [![Coverage Status](https://coveralls.io/repos/github/HospitalRun/cli/badge.svg?branch=master)](https://coveralls.io/github/HospitalRun/cli?branch=master)                                   | [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/HospitalRun/cli.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/HospitalRun/cli/context:javascript)                                   |
+### 🧾 6. Billing, Invoices & Payments
+- Itemized invoice generator supporting consultations, diagnostic tests, medications, and surgical procedures.
+- Flexible payment methods (`CASH`, `CARD`, `UPI`, `INSURANCE`) with payment status tracking (`PENDING`, `PARTIAL`, `PAID`, `CANCELLED`).
 
-<em>Last Update: 2 July 2020</em>
+### 🛡️ 7. Security & Immutable Audit Logging
+- Full compliance and security audit trail capturing every write, update, deletion, and auth action with user metadata, timestamp, target entity, and client IP.
 
-# Application Infrastructure
+### 🌓 8. Modern UI & Theme Customization
+- Responsive design tailored for desktops, tablets, and mobile devices.
+- Built-in Light and Dark themes with customizable UI density and system settings.
 
-A visual representation of the functionality of all HospitalRun modules and their interactions.
+---
 
-[<img width="1658" alt="miro" src="https://user-images.githubusercontent.com/6388707/78055877-7b50ed80-7384-11ea-9e65-602a0f8b9ec9.png">](https://miro.com/app/board/o9J_kv4RtwE=/)
+## 🧠 AI Clinical Intelligence Suite
 
-# Behind HospitalRun
+HospitalRun integrates an intelligent clinical decision support system directly into provider workflows:
 
-## Hosted by
+```mermaid
+flowchart LR
+    subgraph Clinical Inputs
+        A[Doctor's Notes]
+        B[Patient Allergies]
+        C[Active Medications]
+        D[Vital Signs]
+        E[Lab Results]
+    end
 
-[<img src="https://openjsf.org/wp-content/uploads/sites/84/2019/03/openjsf-color-textw.svg" width="120px;"/>](https://openjsf.org/projects/#atlarge)
+    subgraph AI Intelligence Engine
+        F[Clinical NLP Parser]
+        G[Drug-Drug & Allergy Conflict Matrix]
+        H[Vitals Anomaly Scorer]
+        I[30-Day Readmission Risk Predictor]
+        J[Lab Anomaly Prioritizer]
+    end
 
-## Sponsors
+    subgraph Clinical Outputs
+        K[Extracted ICD-10 & Symptoms]
+        L[Real-time Safety Warnings]
+        M[Vitals Risk Flags]
+        N[Risk Score & Preventative Interventions]
+        O[Severity-Ranked Lab Queue]
+    end
 
-[![Sponsors](https://opencollective.com/hospitalrun/sponsors.svg?width=890)](https://opencollective.com/hospitalrun/contribute/sponsors-336/checkout)
+    A --> F --> K
+    B & C --> G --> L
+    D --> H --> M
+    A & C & D --> I --> N
+    E --> J --> O
+```
 
-## Backers
+1. **Drug-Drug & Allergy Conflict Engine**: Real-time validation preventing contraindicated drug combinations (e.g., Aspirin + Clopidogrel) and alerting if prescribed drugs conflict with patient allergies (e.g., Penicillin, Sulfa).
+2. **Predictive 30-Day Readmission Risk**: Machine-assisted risk calculation based on patient age, visit frequency, polypharmacy, chronic comorbidities, and vital parameters.
+3. **Lab Anomaly Detection**: Automatic flagging of abnormal values in CBC, Metabolic Panel, Lipid Panel, Thyroid, LFT, and RFT with high-priority queue sorting.
+4. **Clinical Notes NLP Parser**: Natural language extraction of symptoms, suspected conditions, ICD-10 codes, and medications from unstructured clinical notes.
+5. **AI Pre-Visit Assistant**: Attendance and no-show prediction with checklist suggestions prior to patient consultations.
 
-[![Backers](https://opencollective.com/hospitalrun/backers.svg?width=890)](https://opencollective.com/hospitalrun/contribute/backers-335/checkout)
+---
 
-## Big Thanks
+## 🏗️ System Architecture
 
-Cross-browser Testing Platform and Open Source <3 Provided by [Sauce Labs](https://saucelabs.com)
+```mermaid
+graph TD
+    subgraph Client Layer
+        UI[React 19 Frontend + Vite]
+        Router[React Router DOM v7]
+        Ctx[Context API - Auth / Theme / Toast / Notifications]
+    end
 
-## Lead Maintainer
+    subgraph API Layer
+        API[Express.js REST API Server]
+        AuthMid[JWT Auth & RBAC Middleware]
+        AuditMid[Audit Logging Middleware]
+        RateLimit[Rate Limiting & Input Sanitization]
+    end
 
-[<img src="https://avatars2.githubusercontent.com/u/1620916?s=460&v=4" width="100px;"/><br /><sub><b>Maksim Sinik</b></sub>](https://github.com/fox1t)<br />
+    subgraph Data & Persistence Layer
+        Prisma[Prisma ORM Client v6]
+        DB[(SQLite Database - dev.db)]
+    end
 
-## [Core Maintainers](https://github.com/orgs/HospitalRun/teams/core-maintainers)
+    UI -->|HTTP / JSON Requests| API
+    API --> RateLimit --> AuthMid --> AuditMid --> Prisma
+    Prisma --> DB
+```
 
-<!-- prettier-ignore -->
-| [<img src="https://avatars3.githubusercontent.com/u/18731800?s=460&v=4" width="100px;"/><br /><sub><b>Jack Meyer</b></sub>](https://github.com/jackcmeyer) | [<img src="https://avatars0.githubusercontent.com/u/6388707?s=460&v=4" width="100px;"/><br /><sub><b>Matteo Vivona</b></sub>](https://github.com/tehKapa) |
-|---|---|
+### Stack Breakdown
 
-## [Core Contributors](https://github.com/orgs/HospitalRun/teams/core-contributor)
+| Layer | Technologies |
+| :--- | :--- |
+| **Frontend** | React 19, Vite 8, React Router v7, Lucide Icons, Custom CSS Design Tokens |
+| **Backend API** | Node.js, Express.js, JWT, bcryptjs, express-validator, express-rate-limit, cors |
+| **Database & ORM** | SQLite, Prisma ORM v6 |
+| **Monorepo Orchestration** | Concurrently |
 
-<!-- prettier-ignore -->
-| [<img src="https://avatars3.githubusercontent.com/u/25089405?s=460&v=4" width="100px;"/><br /><sub><b>Stefano Casasola</b></sub>](https://github.com/irvelervel) |  [<img src="https://avatars2.githubusercontent.com/u/8810755?s=460&u=495b69e528066f88944d8ce487ce39afe01b9ccb&v=4" width="100px;"/><br /><sub><b>Kumiko Kashii</b></sub>](https://github.com/kumikokashii) | [<img src="https://avatars3.githubusercontent.com/u/603924?s=460&v=4" width="100px;"/><br /><sub><b>Grace Lau</b></sub>](https://github.com/lauggh) | [<img src="https://avatars2.githubusercontent.com/u/26657904?s=460&u=d960bf3d95ae0c9bb858f1f069fff03e51254ddb&v=4" width="100px;"/><br /><sub><b>Stefano Miceli</b></sub>](https://github.com/StefanoMiC) | [<img src="https://avatars3.githubusercontent.com/u/5468546?s=460&u=9994e6c82ddc7a7d3d930e84ed58f33aa7e48bec&v=4" width="100px;"/><br /><sub><b>Blessed Tabvirwa</b></sub>](https://github.com/blestab) | [<img src="https://avatars1.githubusercontent.com/u/26514778?s=460&u=74dc17fd89ca5722a7fc55fb147403e34bd1a9ae&v=4" width="100px;"/><br /><sub><b>Dr. MaryEtta Morris </b></sub>](https://github.com/morrme) |
-|---|---|---|---|---|---|
+---
 
-## Medical Supervisor
+## 📁 Project Directory Structure
 
-[<img src="https://avatars2.githubusercontent.com/u/24660474?s=460&v=4" width="100px;"/><br /><sub><b>M.D. Daniele Piccolo</b></sub>](https://it.linkedin.com/in/danielepiccolo)<br />
+```
+hospitalrun-master/
+├── package.json                 # Monorepo configuration & unified scripts
+├── server/                      # Express REST API Backend
+│   ├── prisma/
+│   │   ├── schema.prisma        # Prisma data models & SQLite configuration
+│   │   ├── dev.db               # SQLite database file
+│   │   └── seed.js              # Database seed data (users, doctors, patients, meds)
+│   ├── src/
+│   │   ├── index.js             # Express entry point & middleware registration
+│   │   ├── middleware/          # JWT auth, RBAC & audit logging middleware
+│   │   └── routes/              # REST controllers for all hospital modules
+│   └── package.json             # Backend dependencies & scripts
+├── frontend/                    # React Vite Frontend Client
+│   ├── index.html               # Main HTML shell
+│   ├── src/
+│   │   ├── App.jsx              # App root, routing & provider trees
+│   │   ├── App.css              # Design system tokens, styles, and themes
+│   │   ├── components/          # Reusable UI widgets, layout navbar, sidebar
+│   │   ├── context/             # Auth, Theme, Toast, and Notification state
+│   │   ├── pages/               # Views: Dashboard, Patients, Appointments, AI Suite, etc.
+│   │   ├── services/            # API client wrapper (`api.js`)
+│   │   └── utils/               # Date & formatting helpers (`format.js`)
+│   └── package.json             # Frontend dependencies & scripts
+├── SYSTEM_DOCUMENTATION.md      # In-depth system specifications & documentation
+└── WALKTHROUGH.md               # Technical developer manual & request lifecycle
+```
 
-## Past Contributors
+---
 
-[<img src="https://avatars2.githubusercontent.com/u/8914893?s=460&v=4" width="100px;"/><br /><sub><b>Michael Daly</b></sub>](https://github.com/MichaelDalyDev)<br />
+## 🚀 Getting Started & Quick Setup
 
-## Contributors
+### Prerequisites
+- [Node.js](https://nodejs.org/) `>= 18.0.0`
+- `npm` `>= 9.0.0`
 
-[![Contributors](https://opencollective.com/hospitalrun/contributors.svg?width=960&button=false)](https://github.com/HospitalRun/hospitalrun-frontend/graphs/contributors)
+### 1. Clone the Repository
+```bash
+git clone https://github.com/HospitalRun/hospitalrun.git
+cd hospitalrun
+```
 
-## Founders
+### 2. Install All Dependencies
+Install dependencies across both root, `server`, and `frontend` packages with a single command:
+```bash
+npm run install:all
+```
 
-<!-- prettier-ignore -->
-| [<img src="https://avatars0.githubusercontent.com/u/609052?s=460&v=4" width="100px;"/><br /><sub><b>John Kleinschmidtr</b></sub>](https://github.com/jkleinsc) | [<img src="https://avatars0.githubusercontent.com/u/929261?s=400&v=4" width="100px;"/><br /><sub><b>Joel Worrall</b></sub>](https://github.com/tangollama)  | [<img src="https://avatars0.githubusercontent.com/u/1319791?s=460&v=4" width="100px;"/><br /><sub><b>Joel Glovier</b></sub>](https://github.com/jglovier)  |
-|---|---|---|
+### 3. Initialize & Seed Database
+Apply Prisma migrations to create the SQLite schema, then populate initial seed records (admin user, doctors, sample patients, pharmacy inventory, and appointments):
+```bash
+npm run db:migrate
+npm run db:seed
+```
 
-# License
+### 4. Launch Development Environment
+Start both the Express API server and Vite frontend dev server concurrently:
+```bash
+npm run dev
+```
 
-Released under the [MIT license](LICENSE).
+### Application URLs & Ports
+- 🖥️ **Frontend Application**: [http://localhost:5173](http://localhost:5173)
+- ⚙️ **Backend REST API**: [http://localhost:5000](http://localhost:5000)
+- 🗄️ **Prisma Studio (DB Admin GUI)**: `npm run db:studio` ➡️ [http://localhost:5555](http://localhost:5555)
 
+---
+
+## 🔐 Default Login Credentials
+
+Once seeded, you can sign in using the default administrative credentials:
+
+| Role | Email | Password |
+| :--- | :--- | :--- |
+| **System Administrator** | `admin@hospitalrun.io` | `admin123` |
+
+---
+
+## 🛡️ Role-Based Access Control (RBAC)
+
+HospitalRun enforces role-based endpoint authorization across 6 distinct hospital roles:
+
+| Module / Action | `ADMIN` | `DOCTOR` | `NURSE` | `RECEPTIONIST` | `PHARMACIST` | `LAB_TECH` |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Dashboard Analytics** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Patient Directory (View/Search)** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Patient Intake & Registration** | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ |
+| **Vitals Recording** | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| **Clinical Diagnosis & Notes** | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **AI Clinical Decision Support** | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| **Appointment Scheduling** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+| **Pharmacy & Medicine Stock** | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ |
+| **Prescription Dispensing** | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ |
+| **Laboratory Test Results Entry** | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| **Billing, Invoicing & Payments** | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ |
+| **Security Audit Logs** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **System Settings** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+
+---
+
+## 🔌 API Reference
+
+The backend exposes a structured RESTful API under `/api`:
+
+| Category | Endpoint | Methods | Description |
+| :--- | :--- | :--- | :--- |
+| **Auth** | `/api/auth/login` | `POST` | Authenticate user & issue JWT |
+| | `/api/auth/me` | `GET` | Retrieve authenticated user profile |
+| **Patients** | `/api/patients` | `GET`, `POST` | List/search patients or create a new patient |
+| | `/api/patients/:id` | `GET`, `PUT`, `DELETE` | Retrieve, update or delete patient record |
+| | `/api/patients/:id/vitals` | `POST` | Record patient vital signs |
+| **Appointments** | `/api/appointments` | `GET`, `POST` | List appointments or schedule a new visit |
+| | `/api/appointments/:id` | `GET`, `PUT`, `DELETE` | View details, reschedule/update, or delete |
+| **Doctors** | `/api/doctors` | `GET`, `POST` | Doctor directory and profile management |
+| **Medicines** | `/api/medicines` | `GET`, `POST`, `PUT` | Inventory catalog, pricing, and stock updates |
+| **Lab Reports** | `/api/lab-reports` | `GET`, `POST`, `PUT` | Order diagnostics and record completed results |
+| **Billing** | `/api/billing` | `GET`, `POST`, `PUT` | Manage patient invoices, charges, and payments |
+| **Clinical AI** | `/api/clinical-intelligence/drug-check` | `POST` | Evaluate drug interactions & allergy conflicts |
+| | `/api/clinical-intelligence/readmission-risk` | `POST` | Calculate 30-day readmission risk score |
+| | `/api/clinical-intelligence/parse-notes` | `POST` | NLP parsing of clinical notes (ICD-10/symptoms) |
+| | `/api/clinical-intelligence/lab-anomalies` | `GET` | Severity-ranked lab queue anomaly scan |
+| **Audit Logs** | `/api/audit-logs` | `GET` | View administrative security audit trail |
+| **Notifications** | `/api/notifications` | `GET`, `PUT` | Real-time system and clinical notifications |
+| **Settings** | `/api/settings` | `GET`, `PUT` | Hospital profile, preferences, and configs |
+
+---
+
+## 📜 Available Scripts
+
+Run these scripts from the repository root:
+
+| Command | Action |
+| :--- | :--- |
+| `npm run dev` | Runs both backend server and frontend client concurrently with hot reloading |
+| `npm run install:all` | Installs dependencies in root, `server/`, and `frontend/` directories |
+| `npm run dev:server` | Starts the Express server independently (`node --watch`) |
+| `npm run dev:frontend` | Starts the Vite development server independently |
+| `npm run db:migrate` | Runs Prisma schema migrations against the local SQLite database |
+| `npm run db:seed` | Seeds the database with default admin user, doctors, patients, and meds |
+| `npm run db:studio` | Launches Prisma Studio GUI to explore and edit database tables |
+
+---
+
+## 🤝 Contributing
+
+Contributions are warmly welcomed! To contribute:
+
+1. **Fork the Repository**
+2. **Create a Feature Branch** (`git checkout -b feature/AmazingFeature`)
+3. **Commit Your Changes** (`git commit -m 'feat: Add AmazingFeature'`)
+4. **Push to the Branch** (`git push origin feature/AmazingFeature`)
+5. **Open a Pull Request**
+
+Please ensure your code follows clean architecture practices and does not introduce regression in existing modules.
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
