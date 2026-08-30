@@ -18,14 +18,22 @@ const auditLogRoutes = require('./routes/auditLog');
 const clinicalIntelligenceRoutes = require('./routes/clinicalIntelligence');
 const { auditLogger } = require('./middleware/auditLogger');
 
+const path = require('path');
+
 const app = express();
-const prisma = new PrismaClient();
+const dbPath = path.resolve(__dirname, '../prisma/dev.db');
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL || `file:${dbPath}`
+    }
+  }
+});
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173';
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' ? corsOrigin : '*',
+  origin: true,
   credentials: true
 }));
 app.use(express.json());
