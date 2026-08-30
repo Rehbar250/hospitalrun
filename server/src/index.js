@@ -68,14 +68,18 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🏥 HospitalRun server running on http://localhost:${PORT}`);
-});
+// Start server only if executed directly
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`🏥 HospitalRun server running on http://localhost:${PORT}`);
+  });
+}
 
 // Graceful shutdown
 process.on('SIGINT', async () => {
   await prisma.$disconnect();
   process.exit(0);
 });
+
+module.exports = app;
 

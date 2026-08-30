@@ -10,9 +10,22 @@
     "install:all": "cd server && npm install && cd ../frontend && npm install",
     "db:migrate": "cd server && npx prisma migrate dev",
     "db:seed": "cd server && npx prisma db seed",
-    "db:studio": "cd server && npx prisma studio"
+    "db:studio": "cd server && npx prisma studio",
+    "build": "cd server && npx prisma generate && cd ../frontend && npm run build",
+    "vercel-build": "cd server && npm install && npx prisma generate && node prisma/seed.js && cd ../frontend && npm install && npm run build"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.9.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "express-rate-limit": "^8.5.2",
+    "express-validator": "^7.2.0",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
-    "concurrently": "^8.2.0"
+    "concurrently": "^8.2.0",
+    "prisma": "^6.9.0"
   }
 }
