@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import { useToast } from '../context/ToastContext';
+import { useAuth } from '../context/AuthContext';
+import { hasRole, ROLES } from '../utils/rbac';
 import { formatDate, formatDateTime } from '../utils/format';
 import {
   ArrowLeft, CalendarDays, FlaskConical, Pill, Receipt,
@@ -17,9 +19,12 @@ const tabs = [
 ];
 
 export default function PatientDetail() {
+  const { user } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
   const toast = useToast();
+
+  const canRecordVitals = hasRole(user, ROLES.ADMIN, ROLES.DOCTOR, ROLES.NURSE);
 
   const [patient, setPatient] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -155,9 +160,11 @@ export default function PatientDetail() {
             <div className="card">
               <div className="card-header">
                 <h3>Vitals Monitoring History</h3>
-                <button className="btn btn-primary btn-sm" onClick={() => setShowVitalModal(true)}>
-                  <Plus size={16} /> Record Vitals
-                </button>
+                {canRecordVitals && (
+                  <button className="btn btn-primary btn-sm" onClick={() => setShowVitalModal(true)}>
+                    <Plus size={16} /> Record Vitals
+                  </button>
+                )}
               </div>
               <div className="card-body" style={{ padding: 0 }}>
                 <table style={{ borderCollapse: 'collapse', width: '100%' }}>

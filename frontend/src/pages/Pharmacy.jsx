@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { api } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { hasRole, ROLES } from '../utils/rbac';
 import { Search, Plus, X, AlertTriangle } from 'lucide-react';
 import { formatDate } from '../utils/format';
 
 export default function Pharmacy() {
+  const { user } = useAuth();
   const toast = useToast();
   const [medicines, setMedicines] = useState([]);
   const [search, setSearch] = useState('');
@@ -12,6 +15,8 @@ export default function Pharmacy() {
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ name: '', manufacturer: '', category: '', price: '', stock: '', expiryDate: '', description: '' });
+
+  const canManageStock = hasRole(user, ROLES.ADMIN, ROLES.PHARMACIST);
 
   const load = () => {
     setLoading(true);
@@ -45,7 +50,9 @@ export default function Pharmacy() {
         </div>
         <div className="flex gap-3">
           <div className="search-bar"><Search /><input placeholder="Search medicines..." value={search} onChange={e => setSearch(e.target.value)} /></div>
-          <button className="btn btn-primary" onClick={openAdd}><Plus size={18} /> Add Medicine</button>
+          {canManageStock && (
+            <button className="btn btn-primary" onClick={openAdd}><Plus size={18} /> Add Medicine</button>
+          )}
         </div>
       </div>
 
@@ -74,7 +81,13 @@ export default function Pharmacy() {
                       </span>
                     </td>
                     <td>{m.expiryDate ? formatDate(m.expiryDate) : 'N/A'}</td>
-                    <td><button className="btn btn-outline btn-sm" onClick={() => openEdit(m)}>Edit</button></td>
+                    <td>
+                      {canManageStock ? (
+                        <button className="btn btn-outline btn-sm" onClick={() => openEdit(m)}>Edit</button>
+                      ) : (
+                        <span className="text-sm text-muted">Catalog</span>
+                      )}
+                    </td>
                   </tr>
                 ))}
                 {!medicines.length && <tr><td colSpan={7} style={{ textAlign: 'center', padding: 40, color: 'var(--gray-400)' }}>No medicines found</td></tr>}

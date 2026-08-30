@@ -147,7 +147,7 @@ router.get('/:id/vitals', async (req, res, next) => {
 });
 
 // POST /api/patients/:id/vitals
-router.post('/:id/vitals', authorize('ADMIN', 'DOCTOR', 'NURSE', 'RECEPTIONIST'), async (req, res, next) => {
+router.post('/:id/vitals', authorize('ADMIN', 'DOCTOR', 'NURSE'), async (req, res, next) => {
   try {
     const { temperature, bloodPress, pulseRate, spo2, weight } = req.body;
     if (temperature == null || !bloodPress || pulseRate == null || spo2 == null) {

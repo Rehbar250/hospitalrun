@@ -97,7 +97,7 @@ router.get('/:id', async (req, res, next) => {
 });
 
 // POST /api/appointments
-router.post('/', authorize('ADMIN', 'RECEPTIONIST'), async (req, res, next) => {
+router.post('/', authorize('ADMIN', 'DOCTOR', 'NURSE', 'RECEPTIONIST'), async (req, res, next) => {
   try {
     const lastApt = await req.prisma.appointment.findFirst({ orderBy: { id: 'desc' } });
     const nextId = lastApt ? lastApt.id + 1 : 1;
@@ -118,7 +118,7 @@ router.post('/', authorize('ADMIN', 'RECEPTIONIST'), async (req, res, next) => {
 });
 
 // PUT /api/appointments/:id
-router.put('/:id', authorize('ADMIN', 'RECEPTIONIST', 'DOCTOR'), async (req, res, next) => {
+router.put('/:id', authorize('ADMIN', 'DOCTOR', 'NURSE', 'RECEPTIONIST'), async (req, res, next) => {
   try {
     const data = {};
     if (req.body.dateTime) data.dateTime = new Date(req.body.dateTime);
@@ -137,7 +137,7 @@ router.put('/:id', authorize('ADMIN', 'RECEPTIONIST', 'DOCTOR'), async (req, res
 });
 
 // PATCH /api/appointments/:id/status
-router.patch('/:id/status', authorize('ADMIN', 'RECEPTIONIST', 'DOCTOR'), async (req, res, next) => {
+router.patch('/:id/status', authorize('ADMIN', 'DOCTOR', 'NURSE', 'RECEPTIONIST'), async (req, res, next) => {
   try {
     const appointment = await req.prisma.appointment.update({
       where: { id: parseInt(req.params.id) },

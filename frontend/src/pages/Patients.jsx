@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import { Search, Plus, X, UserPlus, Eye } from 'lucide-react';
+import { hasRole, ROLES } from '../utils/rbac';
+import { Search, Plus, X, UserPlus, Eye, Edit3, Trash2 } from 'lucide-react';
 
 export default function Patients() {
+  const { user } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
   const [patients, setPatients] = useState([]);
@@ -14,6 +17,9 @@ export default function Patients() {
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ firstName: '', lastName: '', dateOfBirth: '', gender: 'MALE', phone: '', email: '', address: '', allergies: '', medicalHistory: '' });
+
+  const canManagePatients = hasRole(user, ROLES.ADMIN, ROLES.RECEPTIONIST);
+  const canDeletePatients = hasRole(user, ROLES.ADMIN);
 
   const load = () => {
     setLoading(true);
@@ -65,7 +71,9 @@ export default function Patients() {
             <Search />
             <input placeholder="Search patients..." value={search} onChange={e => setSearch(e.target.value)} />
           </div>
-          <button className="btn btn-primary" onClick={openAdd}><Plus size={18} /> Add Patient</button>
+          {canManagePatients && (
+            <button className="btn btn-primary" onClick={openAdd}><Plus size={18} /> Add Patient</button>
+          )}
         </div>
       </div>
 
@@ -90,8 +98,12 @@ export default function Patients() {
                     <td>
                       <div className="flex gap-2">
                         <button className="btn btn-primary btn-sm" onClick={() => navigate(`/patients/${p.id}`)} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Eye size={14} /> View</button>
-                        <button className="btn btn-outline btn-sm" onClick={() => openEdit(p)}>Edit</button>
-                        <button className="btn btn-danger btn-sm" onClick={() => handleDelete(p.id)}>Delete</button>
+                        {canManagePatients && (
+                          <button className="btn btn-outline btn-sm" onClick={() => openEdit(p)}>Edit</button>
+                        )}
+                        {canDeletePatients && (
+                          <button className="btn btn-danger btn-sm" onClick={() => handleDelete(p.id)}>Delete</button>
+                        )}
                       </div>
                     </td>
                   </tr>

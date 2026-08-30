@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { api } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import { Plus, X } from 'lucide-react';
+import { hasRole, ROLES } from '../utils/rbac';
+import { Plus, X, Eye, Edit3 } from 'lucide-react';
 import { formatDate } from '../utils/format';
 
 export default function LabReports() {
+  const { user } = useAuth();
   const toast = useToast();
   const [data, setData] = useState({ reports: [], total: 0 });
   const [statusFilter, setStatusFilter] = useState('');
@@ -15,6 +18,9 @@ export default function LabReports() {
   const [showResultModal, setShowResultModal] = useState(null);
   const [form, setForm] = useState({ patientId: '', doctorId: '', testName: '', testDescription: '' });
   const [resultForm, setResultForm] = useState({ result: '', status: '' });
+
+  const canOrderTests = hasRole(user, ROLES.ADMIN, ROLES.DOCTOR);
+  const canEnterResults = hasRole(user, ROLES.ADMIN, ROLES.LAB_TECH);
 
   const load = () => {
     setLoading(true);
@@ -49,7 +55,9 @@ export default function LabReports() {
             <option value="">All Statuses</option>
             <option value="PENDING">Pending</option><option value="IN_PROGRESS">In Progress</option><option value="COMPLETED">Completed</option>
           </select>
-          <button className="btn btn-primary" onClick={() => { setForm({ patientId: '', doctorId: '', testName: '', testDescription: '' }); setShowModal(true); }}><Plus size={18} /> New Report</button>
+          {canOrderTests && (
+            <button className="btn btn-primary" onClick={() => { setForm({ patientId: '', doctorId: '', testName: '', testDescription: '' }); setShowModal(true); }}><Plus size={18} /> New Report</button>
+          )}
         </div>
       </div>
 
@@ -69,7 +77,7 @@ export default function LabReports() {
                     <td><span className={`badge ${r.status.toLowerCase().replace('_', '-')}`}>{r.status.replace('_', ' ')}</span></td>
                     <td>
                       <button className="btn btn-outline btn-sm" onClick={() => { setShowResultModal(r); setResultForm({ result: r.result || '', status: r.status }); }}>
-                        {r.status === 'COMPLETED' ? 'View' : 'Update'}
+                        {canEnterResults && r.status !== 'COMPLETED' ? 'Update' : 'View'}
                       </button>
                     </td>
                   </tr>
@@ -114,13 +122,16 @@ export default function LabReports() {
               <div className="modal-body">
                 <p className="text-sm text-muted mb-4"><strong>Test:</strong> {showResultModal.testName}</p>
                 <div className="form-group"><label className="form-label">Status</label>
-                  <select className="form-select" value={resultForm.status} onChange={e => setResultForm({...resultForm, status: e.target.value})}>
+                  <select className="form-select" value={resultForm.status} onChange={e => setResultForm({...resultForm, status: e.target.value})} disabled={!canEnterResults}>
                     <option value="PENDING">Pending</option><option value="IN_PROGRESS">In Progress</option><option value="COMPLETED">Completed</option>
                   </select>
                 </div>
-                <div className="form-group"><label className="form-label">Result</label><textarea className="form-textarea" value={resultForm.result} onChange={e => setResultForm({...resultForm, result: e.target.value})} rows={4} placeholder="Enter test results..." /></div>
+                <div className="form-group"><label className="form-label">Result</label><textarea className="form-textarea" value={resultForm.result} onChange={e => setResultForm({...resultForm, result: e.target.value})} rows={4} placeholder={canEnterResults ? "Enter test results..." : "No results entered yet."} readOnly={!canEnterResults} /></div>
               </div>
-              <div className="modal-footer"><button type="button" className="btn btn-outline" onClick={() => setShowResultModal(null)}>Cancel</button><button type="submit" className="btn btn-primary">Save</button></div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-outline" onClick={() => setShowResultModal(null)}>Close</button>
+                {canEnterResults && <button type="submit" className="btn btn-primary">Save Results</button>}
+              </div>
             </form>
           </div>
         </div>

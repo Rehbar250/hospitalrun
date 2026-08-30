@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
 import { api } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { hasRole, ROLES } from '../utils/rbac';
 import { Plus, X, CreditCard } from 'lucide-react';
 
 export default function Billing() {
+  const { user } = useAuth();
   const toast = useToast();
   const [data, setData] = useState({ invoices: [], total: 0 });
   const [patients, setPatients] = useState([]);
@@ -13,6 +16,8 @@ export default function Billing() {
   const [showPayModal, setShowPayModal] = useState(null);
   const [payForm, setPayForm] = useState({ amount: '', paymentMethod: 'CASH' });
   const [form, setForm] = useState({ patientId: '', paymentMethod: 'CASH', items: [{ description: '', amount: '', quantity: 1, type: 'OTHER' }] });
+
+  const canManageBilling = hasRole(user, ROLES.ADMIN, ROLES.RECEPTIONIST);
 
   const load = () => {
     setLoading(true);
@@ -51,7 +56,9 @@ export default function Billing() {
             <option value="">All Statuses</option>
             <option value="PENDING">Pending</option><option value="PARTIAL">Partial</option><option value="PAID">Paid</option><option value="CANCELLED">Cancelled</option>
           </select>
-          <button className="btn btn-primary" onClick={() => { setForm({ patientId: '', paymentMethod: 'CASH', items: [{ description: '', amount: '', quantity: 1, type: 'OTHER' }] }); setShowModal(true); }}><Plus size={18} /> New Invoice</button>
+          {canManageBilling && (
+            <button className="btn btn-primary" onClick={() => { setForm({ patientId: '', paymentMethod: 'CASH', items: [{ description: '', amount: '', quantity: 1, type: 'OTHER' }] }); setShowModal(true); }}><Plus size={18} /> New Invoice</button>
+          )}
         </div>
       </div>
 
@@ -71,10 +78,12 @@ export default function Billing() {
                     <td>{inv.paymentMethod || '-'}</td>
                     <td><span className={`badge ${inv.status.toLowerCase()}`}>{inv.status}</span></td>
                     <td>
-                      {inv.status !== 'PAID' && inv.status !== 'CANCELLED' && (
+                      {canManageBilling && inv.status !== 'PAID' && inv.status !== 'CANCELLED' ? (
                         <button className="btn btn-success btn-sm" onClick={() => { setShowPayModal(inv); setPayForm({ amount: Number(inv.totalAmount) - Number(inv.paidAmount), paymentMethod: inv.paymentMethod || 'CASH' }); }}>
                           <CreditCard size={14} /> Pay
                         </button>
+                      ) : (
+                        <span className="text-sm text-muted">{inv.status === 'PAID' ? 'Settled' : 'View Only'}</span>
                       )}
                     </td>
                   </tr>

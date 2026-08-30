@@ -237,11 +237,16 @@ npm run dev
 
 ## 🔐 Default Login Credentials
 
-Once seeded, you can sign in using the default administrative credentials:
+Once seeded, you can sign in using any of the default role-based test credentials:
 
-| Role | Email | Password |
-| :--- | :--- | :--- |
-| **System Administrator** | `admin@hospitalrun.io` | `admin123` |
+| Role | Email | Password | Primary Permissions |
+| :--- | :--- | :--- | :--- |
+| **System Administrator** (`ADMIN`) | `admin@hospitalrun.io` | `admin123` | Full system access, audit logs, system configuration, doctors |
+| **Medical Doctor** (`DOCTOR`) | `dr.sharma@hospitalrun.io` | `doctor123` | Clinical notes, AI decision support, prescriptions, appointments |
+| **Nurse** (`NURSE`) | `nurse@hospitalrun.io` | `nurse123` | Vitals recording, appointment management, patient monitoring |
+| **Receptionist** (`RECEPTIONIST`) | `receptionist@hospitalrun.io` | `reception123` | Patient intake, scheduling, billing, invoicing & payments |
+| **Pharmacist** (`PHARMACIST`) | `pharmacist@hospitalrun.io` | `pharma123` | Medicine catalog, stock management, prescription dispensing |
+| **Lab Technician** (`LAB_TECH`) | `labtech@hospitalrun.io` | `labtech123` | Diagnostic lab test results entry & processing |
 
 ---
 

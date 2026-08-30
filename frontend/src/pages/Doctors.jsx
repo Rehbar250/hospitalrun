@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
 import { api } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import { Search, Plus, X } from 'lucide-react';
+import { hasRole, ROLES } from '../utils/rbac';
+import { Search, Plus, X, User } from 'lucide-react';
 
 export default function Doctors() {
+  const { user } = useAuth();
   const toast = useToast();
   const [doctors, setDoctors] = useState([]);
   const [search, setSearch] = useState('');
@@ -11,6 +14,8 @@ export default function Doctors() {
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ firstName: '', lastName: '', specialization: '', phone: '', email: '', qualification: '', consultationFee: '', status: 'ACTIVE' });
+
+  const canManageDoctors = hasRole(user, ROLES.ADMIN);
 
   const load = () => {
     setLoading(true);
@@ -23,7 +28,7 @@ export default function Doctors() {
   useEffect(() => { load(); }, [search]);
 
   const openAdd = () => { setEditing(null); setForm({ firstName: '', lastName: '', specialization: '', phone: '', email: '', qualification: '', consultationFee: '', status: 'ACTIVE' }); setShowModal(true); };
-  const openEdit = (d) => { setEditing(d); setForm({ firstName: d.firstName, lastName: d.lastName, specialization: d.specialization, phone: d.phone, email: d.email, qualification: d.qualification || '', consultationFee: d.consultationFee || '', status: d.status }); setShowModal(true); };
+  const openEdit = (d) => { if (!canManageDoctors) return; setEditing(d); setForm({ firstName: d.firstName, lastName: d.lastName, specialization: d.specialization, phone: d.phone, email: d.email, qualification: d.qualification || '', consultationFee: d.consultationFee || '', status: d.status }); setShowModal(true); };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,14 +49,16 @@ export default function Doctors() {
         </div>
         <div className="flex gap-3">
           <div className="search-bar"><Search /><input placeholder="Search doctors..." value={search} onChange={e => setSearch(e.target.value)} /></div>
-          <button className="btn btn-primary" onClick={openAdd}><Plus size={18} /> Add Doctor</button>
+          {canManageDoctors && (
+            <button className="btn btn-primary" onClick={openAdd}><Plus size={18} /> Add Doctor</button>
+          )}
         </div>
       </div>
 
       {loading ? <div className="loading-spinner"><div className="spinner" /></div> : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 20 }}>
           {doctors.map(d => (
-            <div key={d.id} className="card" style={{ cursor: 'pointer' }} onClick={() => openEdit(d)}>
+            <div key={d.id} className="card" style={{ cursor: canManageDoctors ? 'pointer' : 'default' }} onClick={() => openEdit(d)}>
               <div className="card-body">
                 <div className="flex items-center gap-3" style={{ marginBottom: 16 }}>
                   <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), var(--accent))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 16 }}>

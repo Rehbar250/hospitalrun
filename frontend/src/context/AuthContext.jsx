@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { hasRole, hasPermission } from '../utils/rbac';
 
 const AuthContext = createContext(null);
 
@@ -56,8 +57,20 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  const checkRole = (...roles) => hasRole(user, ...roles);
+  const checkPermission = (perm) => hasPermission(user, perm);
+
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
+    <AuthContext.Provider value={{
+      user,
+      token,
+      loading,
+      login,
+      register,
+      logout,
+      hasRole: checkRole,
+      hasPermission: checkPermission,
+    }}>
       {children}
     </AuthContext.Provider>
   );

@@ -6,19 +6,30 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Seeding database...');
 
-  // Create admin user
-  const hashedPassword = await bcrypt.hash('admin123', 10);
-  const admin = await prisma.user.upsert({
-    where: { email: 'admin@hospitalrun.io' },
-    update: {},
-    create: {
-      email: 'admin@hospitalrun.io',
-      password: hashedPassword,
-      name: 'System Admin',
-      role: 'ADMIN',
-    },
-  });
-  console.log('✅ Admin user created:', admin.email);
+  // Create default users for all 6 HospitalRun RBAC roles
+  const usersToSeed = [
+    { email: 'admin@hospitalrun.io', password: 'admin123', name: 'Dr. Sarah Connor (Admin)', role: 'ADMIN' },
+    { email: 'dr.sharma@hospitalrun.io', password: 'doctor123', name: 'Dr. Rajesh Sharma', role: 'DOCTOR' },
+    { email: 'nurse@hospitalrun.io', password: 'nurse123', name: 'Nurse Ananya Roy', role: 'NURSE' },
+    { email: 'receptionist@hospitalrun.io', password: 'reception123', name: 'Pooja Verma (Desk)', role: 'RECEPTIONIST' },
+    { email: 'pharmacist@hospitalrun.io', password: 'pharma123', name: 'Rohan Mehta (PharmD)', role: 'PHARMACIST' },
+    { email: 'labtech@hospitalrun.io', password: 'labtech123', name: 'Vikram Joshi (Lab Tech)', role: 'LAB_TECH' },
+  ];
+
+  for (const u of usersToSeed) {
+    const hashedPassword = await bcrypt.hash(u.password, 10);
+    await prisma.user.upsert({
+      where: { email: u.email },
+      update: { role: u.role, name: u.name, password: hashedPassword },
+      create: {
+        email: u.email,
+        password: hashedPassword,
+        name: u.name,
+        role: u.role,
+      },
+    });
+  }
+  console.log(`✅ Seeded ${usersToSeed.length} users across all RBAC roles (ADMIN, DOCTOR, NURSE, RECEPTIONIST, PHARMACIST, LAB_TECH)`);
 
   // Create doctors
   const doctors = await Promise.all([
@@ -183,171 +194,189 @@ async function main() {
   console.log(`✅ ${patients.length} patients created`);
 
   // Create medicines
-  const medicines = await Promise.all([
-    prisma.medicine.create({ data: { name: 'Paracetamol 500mg', manufacturer: 'Cipla', category: 'Analgesic', price: 25, stock: 500, expiryDate: new Date('2027-06-30') } }),
-    prisma.medicine.create({ data: { name: 'Amoxicillin 250mg', manufacturer: 'Sun Pharma', category: 'Antibiotic', price: 85, stock: 200, expiryDate: new Date('2027-03-15') } }),
-    prisma.medicine.create({ data: { name: 'Metformin 500mg', manufacturer: 'Dr. Reddy\'s', category: 'Antidiabetic', price: 45, stock: 350, expiryDate: new Date('2027-09-20') } }),
-    prisma.medicine.create({ data: { name: 'Amlodipine 5mg', manufacturer: 'Lupin', category: 'Antihypertensive', price: 55, stock: 8, expiryDate: new Date('2027-01-10') } }),
-    prisma.medicine.create({ data: { name: 'Omeprazole 20mg', manufacturer: 'Cipla', category: 'Antacid', price: 65, stock: 150, expiryDate: new Date('2027-12-31') } }),
-    prisma.medicine.create({ data: { name: 'Cetirizine 10mg', manufacturer: 'GSK', category: 'Antihistamine', price: 15, stock: 5, expiryDate: new Date('2027-08-15') } }),
-    prisma.medicine.create({ data: { name: 'Ibuprofen 400mg', manufacturer: 'Mankind', category: 'NSAID', price: 30, stock: 300, expiryDate: new Date('2027-05-20') } }),
-    prisma.medicine.create({ data: { name: 'Azithromycin 500mg', manufacturer: 'Zydus', category: 'Antibiotic', price: 120, stock: 100, expiryDate: new Date('2027-04-10') } }),
-  ]);
-  console.log(`✅ ${medicines.length} medicines created`);
+  const medicineData = [
+    { name: 'Paracetamol 500mg', manufacturer: 'Cipla', category: 'Analgesic', price: 25, stock: 500, expiryDate: new Date('2027-06-30') },
+    { name: 'Amoxicillin 250mg', manufacturer: 'Sun Pharma', category: 'Antibiotic', price: 85, stock: 200, expiryDate: new Date('2027-03-15') },
+    { name: 'Metformin 500mg', manufacturer: 'Dr. Reddy\'s', category: 'Antidiabetic', price: 45, stock: 350, expiryDate: new Date('2027-09-20') },
+    { name: 'Amlodipine 5mg', manufacturer: 'Lupin', category: 'Antihypertensive', price: 55, stock: 8, expiryDate: new Date('2027-01-10') },
+    { name: 'Omeprazole 20mg', manufacturer: 'Cipla', category: 'Antacid', price: 65, stock: 150, expiryDate: new Date('2027-12-31') },
+    { name: 'Cetirizine 10mg', manufacturer: 'GSK', category: 'Antihistamine', price: 15, stock: 5, expiryDate: new Date('2027-08-15') },
+    { name: 'Ibuprofen 400mg', manufacturer: 'Mankind', category: 'NSAID', price: 30, stock: 300, expiryDate: new Date('2027-05-20') },
+    { name: 'Azithromycin 500mg', manufacturer: 'Zydus', category: 'Antibiotic', price: 120, stock: 100, expiryDate: new Date('2027-04-10') },
+  ];
+
+  for (const m of medicineData) {
+    const existing = await prisma.medicine.findFirst({ where: { name: m.name } });
+    if (!existing) {
+      await prisma.medicine.create({ data: m });
+    }
+  }
+  console.log(`✅ Seeded medicines catalog`);
 
   // Create appointments
   const now = new Date();
-  const appointments = await Promise.all([
-    prisma.appointment.create({
-      data: {
-        appointmentId: 'APT-0001',
-        patientId: patients[0].id,
-        doctorId: doctors[0].id,
-        dateTime: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 10, 0),
-        status: 'SCHEDULED',
-        type: 'CHECKUP',
-        notes: 'Regular cardiac checkup',
-      },
-    }),
-    prisma.appointment.create({
-      data: {
-        appointmentId: 'APT-0002',
-        patientId: patients[1].id,
-        doctorId: doctors[1].id,
-        dateTime: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 11, 30),
-        status: 'SCHEDULED',
-        type: 'CONSULTATION',
-      },
-    }),
-    prisma.appointment.create({
-      data: {
-        appointmentId: 'APT-0003',
-        patientId: patients[2].id,
-        doctorId: doctors[0].id,
-        dateTime: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 14, 0),
-        status: 'IN_PROGRESS',
-        type: 'FOLLOW_UP',
-        notes: 'Follow-up for blood pressure monitoring',
-      },
-    }),
-    prisma.appointment.create({
-      data: {
-        appointmentId: 'APT-0004',
-        patientId: patients[3].id,
-        doctorId: doctors[3].id,
-        dateTime: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 15, 30),
-        status: 'SCHEDULED',
-        type: 'CONSULTATION',
-      },
-    }),
-    prisma.appointment.create({
-      data: {
-        appointmentId: 'APT-0005',
-        patientId: patients[4].id,
-        doctorId: doctors[2].id,
-        dateTime: new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 9, 0),
-        status: 'COMPLETED',
-        type: 'CHECKUP',
-        notes: 'Post-surgery knee evaluation',
-      },
-    }),
-  ]);
-  console.log(`✅ ${appointments.length} appointments created`);
+  const appointmentData = [
+    {
+      appointmentId: 'APT-0001',
+      patientId: patients[0].id,
+      doctorId: doctors[0].id,
+      dateTime: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 10, 0),
+      status: 'SCHEDULED',
+      type: 'CHECKUP',
+      notes: 'Regular cardiac checkup',
+    },
+    {
+      appointmentId: 'APT-0002',
+      patientId: patients[1].id,
+      doctorId: doctors[1].id,
+      dateTime: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 11, 30),
+      status: 'SCHEDULED',
+      type: 'CONSULTATION',
+    },
+    {
+      appointmentId: 'APT-0003',
+      patientId: patients[2].id,
+      doctorId: doctors[0].id,
+      dateTime: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 14, 0),
+      status: 'IN_PROGRESS',
+      type: 'FOLLOW_UP',
+      notes: 'Follow-up for blood pressure monitoring',
+    },
+    {
+      appointmentId: 'APT-0004',
+      patientId: patients[3].id,
+      doctorId: doctors[3].id,
+      dateTime: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 15, 30),
+      status: 'SCHEDULED',
+      type: 'CONSULTATION',
+    },
+    {
+      appointmentId: 'APT-0005',
+      patientId: patients[4].id,
+      doctorId: doctors[2].id,
+      dateTime: new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 9, 0),
+      status: 'COMPLETED',
+      type: 'CHECKUP',
+      notes: 'Post-surgery knee evaluation',
+    },
+  ];
+
+  for (const apt of appointmentData) {
+    await prisma.appointment.upsert({
+      where: { appointmentId: apt.appointmentId },
+      update: apt,
+      create: apt,
+    });
+  }
+  console.log(`✅ ${appointmentData.length} appointments seeded`);
 
   // Create lab reports
-  const labReports = await Promise.all([
-    prisma.labReport.create({
-      data: {
-        reportId: 'LAB-0001',
-        patientId: patients[0].id,
-        doctorId: doctors[0].id,
-        testName: 'Complete Blood Count (CBC)',
-        testDescription: 'Routine blood analysis',
-        status: 'COMPLETED',
-        result: 'All values within normal range. WBC: 7500, RBC: 5.2M, Hemoglobin: 14.5 g/dL',
-      },
-    }),
-    prisma.labReport.create({
-      data: {
-        reportId: 'LAB-0002',
-        patientId: patients[2].id,
-        doctorId: doctors[0].id,
-        testName: 'Lipid Profile',
-        testDescription: 'Cholesterol and triglycerides analysis',
-        status: 'PENDING',
-      },
-    }),
-    prisma.labReport.create({
-      data: {
-        reportId: 'LAB-0003',
-        patientId: patients[4].id,
-        doctorId: doctors[2].id,
-        testName: 'X-Ray (Right Knee)',
-        testDescription: 'Post-operative assessment',
-        status: 'IN_PROGRESS',
-      },
-    }),
-  ]);
-  console.log(`✅ ${labReports.length} lab reports created`);
+  const labData = [
+    {
+      reportId: 'LAB-0001',
+      patientId: patients[0].id,
+      doctorId: doctors[0].id,
+      testName: 'Complete Blood Count (CBC)',
+      testDescription: 'Routine blood analysis',
+      status: 'COMPLETED',
+      result: 'All values within normal range. WBC: 7500, RBC: 5.2M, Hemoglobin: 14.5 g/dL',
+    },
+    {
+      reportId: 'LAB-0002',
+      patientId: patients[2].id,
+      doctorId: doctors[0].id,
+      testName: 'Lipid Profile',
+      testDescription: 'Cholesterol and triglycerides analysis',
+      status: 'PENDING',
+    },
+    {
+      reportId: 'LAB-0003',
+      patientId: patients[4].id,
+      doctorId: doctors[2].id,
+      testName: 'X-Ray (Right Knee)',
+      testDescription: 'Post-operative assessment',
+      status: 'IN_PROGRESS',
+    },
+  ];
+
+  for (const lab of labData) {
+    await prisma.labReport.upsert({
+      where: { reportId: lab.reportId },
+      update: lab,
+      create: lab,
+    });
+  }
+  console.log(`✅ ${labData.length} lab reports seeded`);
 
   // Create billing
-  const billings = await Promise.all([
-    prisma.billing.create({
-      data: {
-        invoiceId: 'INV-0001',
-        patientId: patients[0].id,
-        totalAmount: 1300,
-        paidAmount: 1300,
-        status: 'PAID',
-        paymentMethod: 'CARD',
-        items: {
-          create: [
-            { description: 'Cardiology Consultation', amount: 800, type: 'CONSULTATION' },
-            { description: 'CBC Test', amount: 500, type: 'LAB_TEST' },
-          ],
+  const billingData = [
+    {
+      invoiceId: 'INV-0001',
+      patientId: patients[0].id,
+      totalAmount: 1300,
+      paidAmount: 1300,
+      status: 'PAID',
+      paymentMethod: 'CARD',
+      items: [
+        { description: 'Cardiology Consultation', amount: 800, type: 'CONSULTATION' },
+        { description: 'CBC Test', amount: 500, type: 'LAB_TEST' },
+      ],
+    },
+    {
+      invoiceId: 'INV-0002',
+      patientId: patients[2].id,
+      totalAmount: 2500,
+      paidAmount: 1000,
+      status: 'PARTIAL',
+      paymentMethod: 'CASH',
+      items: [
+        { description: 'Cardiology Consultation', amount: 800, type: 'CONSULTATION' },
+        { description: 'Lipid Profile Test', amount: 700, type: 'LAB_TEST' },
+        { description: 'Medication - Metformin, Amlodipine', amount: 1000, type: 'MEDICINE' },
+      ],
+    },
+    {
+      invoiceId: 'INV-0003',
+      patientId: patients[4].id,
+      totalAmount: 5000,
+      paidAmount: 0,
+      status: 'PENDING',
+      items: [
+        { description: 'Orthopedic Consultation', amount: 1000, type: 'CONSULTATION' },
+        { description: 'X-Ray', amount: 1500, type: 'LAB_TEST' },
+        { description: 'Knee Brace', amount: 2500, type: 'PROCEDURE' },
+      ],
+    },
+  ];
+
+  for (const b of billingData) {
+    const existing = await prisma.billing.findUnique({ where: { invoiceId: b.invoiceId } });
+    if (!existing) {
+      await prisma.billing.create({
+        data: {
+          invoiceId: b.invoiceId,
+          patientId: b.patientId,
+          totalAmount: b.totalAmount,
+          paidAmount: b.paidAmount,
+          status: b.status,
+          paymentMethod: b.paymentMethod,
+          items: {
+            create: b.items,
+          },
         },
-      },
-    }),
-    prisma.billing.create({
-      data: {
-        invoiceId: 'INV-0002',
-        patientId: patients[2].id,
-        totalAmount: 2500,
-        paidAmount: 1000,
-        status: 'PARTIAL',
-        paymentMethod: 'CASH',
-        items: {
-          create: [
-            { description: 'Cardiology Consultation', amount: 800, type: 'CONSULTATION' },
-            { description: 'Lipid Profile Test', amount: 700, type: 'LAB_TEST' },
-            { description: 'Medication - Metformin, Amlodipine', amount: 1000, type: 'MEDICINE' },
-          ],
-        },
-      },
-    }),
-    prisma.billing.create({
-      data: {
-        invoiceId: 'INV-0003',
-        patientId: patients[4].id,
-        totalAmount: 5000,
-        paidAmount: 0,
-        status: 'PENDING',
-        items: {
-          create: [
-            { description: 'Orthopedic Consultation', amount: 1000, type: 'CONSULTATION' },
-            { description: 'X-Ray', amount: 1500, type: 'LAB_TEST' },
-            { description: 'Knee Brace', amount: 2500, type: 'PROCEDURE' },
-          ],
-        },
-      },
-    }),
-  ]);
-  console.log(`✅ ${billings.length} billing records created`);
+      });
+    }
+  }
+  console.log(`✅ ${billingData.length} billing records seeded`);
 
   console.log('\n🎉 Database seeded successfully!');
-  console.log('\n📋 Login credentials:');
-  console.log('   Email: admin@hospitalrun.io');
-  console.log('   Password: admin123');
+  console.log('\n📋 Default Login Credentials across all 6 Hospital Roles:');
+  console.log('   👑 ADMIN:        admin@hospitalrun.io        / admin123');
+  console.log('   👨‍⚕️ DOCTOR:       dr.sharma@hospitalrun.io    / doctor123');
+  console.log('   👩‍⚕️ NURSE:        nurse@hospitalrun.io        / nurse123');
+  console.log('   🏢 RECEPTIONIST: receptionist@hospitalrun.io / reception123');
+  console.log('   💊 PHARMACIST:   pharmacist@hospitalrun.io   / pharma123');
+  console.log('   🧪 LAB_TECH:     labtech@hospitalrun.io      / labtech123\n');
 }
 
 main()

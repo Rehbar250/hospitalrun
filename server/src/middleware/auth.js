@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const { ROLES } = require('./rbac');
 
 function authMiddleware(req, res, next) {
   const authHeader = req.headers.authorization;
@@ -19,15 +20,21 @@ function authMiddleware(req, res, next) {
 }
 
 function authorize(...roles) {
+  const allowedRoles = roles.flat().map(r => String(r).toUpperCase());
   return (req, res, next) => {
     if (!req.user) {
       return res.status(401).json({ error: 'Not authenticated.' });
     }
-    if (roles.length && !roles.includes(req.user.role)) {
-      return res.status(403).json({ error: 'Insufficient permissions.' });
+    const userRole = (req.user.role || '').toUpperCase();
+    if (allowedRoles.length && !allowedRoles.includes(userRole)) {
+      return res.status(403).json({
+        error: `Insufficient permissions. Role '${req.user.role}' is not authorized to access this resource.`,
+        requiredRoles: allowedRoles,
+      });
     }
     next();
   };
 }
 
-module.exports = { authMiddleware, authorize };
+module.exports = { authMiddleware, authorize, ROLES };
+

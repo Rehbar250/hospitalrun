@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { api } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { hasRole, ROLES } from '../utils/rbac';
 import { Plus, X, CalendarClock, CalendarPlus, Search, Sparkles, Brain, Loader2, Trash2 } from 'lucide-react';
 import { formatDate, formatDateTime } from '../utils/format';
 
 export default function Appointments() {
+  const { user } = useAuth();
   const toast = useToast();
   const [data, setData] = useState({ appointments: [], total: 0 });
   const [doctors, setDoctors] = useState([]);
@@ -13,6 +16,10 @@ export default function Appointments() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ patientId: '', doctorId: '', dateTime: '', type: 'CHECKUP', notes: '' });
+
+  const canSchedule = hasRole(user, ROLES.ADMIN, ROLES.DOCTOR, ROLES.NURSE, ROLES.RECEPTIONIST);
+  const canViewAIAssist = hasRole(user, ROLES.ADMIN, ROLES.DOCTOR);
+  const canDelete = hasRole(user, ROLES.ADMIN, ROLES.RECEPTIONIST);
 
   // Reschedule modal state
   const [showRescheduleModal, setShowRescheduleModal] = useState(null);
@@ -155,7 +162,9 @@ export default function Appointments() {
             <option value="">All Statuses</option>
             {statuses.map(s => <option key={s} value={s}>{s.replace('_', ' ')}</option>)}
           </select>
-          <button className="btn btn-primary" onClick={() => { setForm({ patientId: '', doctorId: '', dateTime: '', type: 'CHECKUP', notes: '' }); setShowModal(true); }}><Plus size={18} /> New Appointment</button>
+          {canSchedule && (
+            <button className="btn btn-primary" onClick={() => { setForm({ patientId: '', doctorId: '', dateTime: '', type: 'CHECKUP', notes: '' }); setShowModal(true); }}><Plus size={18} /> New Appointment</button>
+          )}
         </div>
       </div>
 
@@ -177,10 +186,14 @@ export default function Appointments() {
                     <td><span className={`badge ${a.status.toLowerCase().replace('_', '-')}`}>{a.status.replace('_', ' ')}</span></td>
                     <td>
                       <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
-                        <select className="form-select" value={a.status} onChange={e => updateStatus(a.id, e.target.value)} style={{ width: 130, padding: '4px 8px', fontSize: 12 }}>
-                          {statuses.map(s => <option key={s} value={s}>{s.replace('_', ' ')}</option>)}
-                        </select>
-                        {(a.status === 'SCHEDULED' || a.status === 'IN_PROGRESS') && (
+                        {canSchedule ? (
+                          <select className="form-select" value={a.status} onChange={e => updateStatus(a.id, e.target.value)} style={{ width: 130, padding: '4px 8px', fontSize: 12 }}>
+                            {statuses.map(s => <option key={s} value={s}>{s.replace('_', ' ')}</option>)}
+                          </select>
+                        ) : (
+                          <span className="text-sm text-muted">View Only</span>
+                        )}
+                        {canSchedule && (a.status === 'SCHEDULED' || a.status === 'IN_PROGRESS') && (
                           <button
                             className="btn btn-outline btn-sm"
                             onClick={() => openReschedule(a)}
@@ -190,30 +203,36 @@ export default function Appointments() {
                             <CalendarClock size={13} /> Reschedule
                           </button>
                         )}
-                        <button
-                          className="btn btn-outline btn-sm"
-                          onClick={() => openFollowUp(a)}
-                          title="Schedule next appointment for this patient"
-                          style={{ padding: '4px 8px', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}
-                        >
-                          <CalendarPlus size={13} /> Next Appt
-                        </button>
-                        <button
-                          className="btn btn-outline btn-sm"
-                          onClick={() => openInsights(a)}
-                          title="View AI Clinical Insights for this visit"
-                          style={{ padding: '4px 8px', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4, borderColor: '#8b5cf6', color: '#8b5cf6' }}
-                        >
-                          <Sparkles size={13} /> AI Assist
-                        </button>
-                        <button
-                          className="btn btn-danger btn-sm"
-                          onClick={() => handleDelete(a.id)}
-                          title="Delete this appointment"
-                          style={{ padding: '4px 8px', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}
-                        >
-                          <Trash2 size={13} /> Delete
-                        </button>
+                        {canSchedule && (
+                          <button
+                            className="btn btn-outline btn-sm"
+                            onClick={() => openFollowUp(a)}
+                            title="Schedule next appointment for this patient"
+                            style={{ padding: '4px 8px', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}
+                          >
+                            <CalendarPlus size={13} /> Next Appt
+                          </button>
+                        )}
+                        {canViewAIAssist && (
+                          <button
+                            className="btn btn-outline btn-sm"
+                            onClick={() => openInsights(a)}
+                            title="View AI Clinical Insights for this visit"
+                            style={{ padding: '4px 8px', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4, borderColor: '#8b5cf6', color: '#8b5cf6' }}
+                          >
+                            <Sparkles size={13} /> AI Assist
+                          </button>
+                        )}
+                        {canDelete && (
+                          <button
+                            className="btn btn-danger btn-sm"
+                            onClick={() => handleDelete(a.id)}
+                            title="Delete this appointment"
+                            style={{ padding: '4px 8px', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}
+                          >
+                            <Trash2 size={13} /> Delete
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

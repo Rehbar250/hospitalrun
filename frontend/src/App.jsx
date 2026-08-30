@@ -17,6 +17,8 @@ import Billing from './pages/Billing';
 import Settings from './pages/Settings';
 import AuditLog from './pages/AuditLog';
 import ClinicalIntelligence from './pages/ClinicalIntelligence';
+import RoleRoute from './components/RoleRoute';
+import { ROLES } from './utils/rbac';
 import './App.css';
 
 function ProtectedRoute({ children }) {
@@ -39,14 +41,14 @@ function AppRoutes() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/patients" element={<Patients />} />
         <Route path="/patients/:id" element={<PatientDetail />} />
-        <Route path="/appointments" element={<Appointments />} />
+        <Route path="/appointments" element={<RoleRoute allowedRoles={[ROLES.ADMIN, ROLES.DOCTOR, ROLES.NURSE, ROLES.RECEPTIONIST]}><Appointments /></RoleRoute>} />
         <Route path="/doctors" element={<Doctors />} />
-        <Route path="/lab-reports" element={<LabReports />} />
-        <Route path="/pharmacy" element={<Pharmacy />} />
-        <Route path="/billing" element={<Billing />} />
+        <Route path="/lab-reports" element={<RoleRoute allowedRoles={[ROLES.ADMIN, ROLES.DOCTOR, ROLES.LAB_TECH]}><LabReports /></RoleRoute>} />
+        <Route path="/pharmacy" element={<RoleRoute allowedRoles={[ROLES.ADMIN, ROLES.DOCTOR, ROLES.PHARMACIST]}><Pharmacy /></RoleRoute>} />
+        <Route path="/billing" element={<RoleRoute allowedRoles={[ROLES.ADMIN, ROLES.RECEPTIONIST]}><Billing /></RoleRoute>} />
         <Route path="/settings" element={<Settings />} />
-        <Route path="/audit-log" element={<AuditLog />} />
-            <Route path="/clinical-intelligence" element={<ClinicalIntelligence />} />
+        <Route path="/audit-log" element={<RoleRoute allowedRoles={[ROLES.ADMIN]}><AuditLog /></RoleRoute>} />
+        <Route path="/clinical-intelligence" element={<RoleRoute allowedRoles={[ROLES.ADMIN, ROLES.DOCTOR]}><ClinicalIntelligence /></RoleRoute>} />
       </Route>
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>

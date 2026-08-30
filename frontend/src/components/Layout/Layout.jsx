@@ -11,21 +11,27 @@ import {
 import { useState } from 'react';
 import { formatDate } from '../../utils/format';
 
+import { getRoleInfo, hasRole, ROLES } from '../../utils/rbac';
+
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { section: 'Management' },
-  { to: '/patients', icon: Users, label: 'Patients' },
-  { to: '/appointments', icon: CalendarDays, label: 'Appointments' },
-  { to: '/doctors', icon: Stethoscope, label: 'Doctors' },
-  { section: 'Clinical' },
-  { to: '/lab-reports', icon: FlaskConical, label: 'Lab Reports' },
-  { to: '/pharmacy', icon: Pill, label: 'Pharmacy' },
-  { to: '/clinical-intelligence', icon: Brain, label: 'AI Intelligence' },
-  { section: 'Finance' },
-  { to: '/billing', icon: Receipt, label: 'Billing' },
-  { section: 'System' },
-  { to: '/settings', icon: Settings, label: 'Settings' },
-  { to: '/audit-log', icon: Shield, label: 'Audit Log', adminOnly: true },
+  { section: 'Management', items: [
+    { to: '/patients', icon: Users, label: 'Patients' },
+    { to: '/appointments', icon: CalendarDays, label: 'Appointments', roles: [ROLES.ADMIN, ROLES.DOCTOR, ROLES.NURSE, ROLES.RECEPTIONIST] },
+    { to: '/doctors', icon: Stethoscope, label: 'Doctors' },
+  ]},
+  { section: 'Clinical', items: [
+    { to: '/lab-reports', icon: FlaskConical, label: 'Lab Reports', roles: [ROLES.ADMIN, ROLES.DOCTOR, ROLES.LAB_TECH] },
+    { to: '/pharmacy', icon: Pill, label: 'Pharmacy', roles: [ROLES.ADMIN, ROLES.DOCTOR, ROLES.PHARMACIST] },
+    { to: '/clinical-intelligence', icon: Brain, label: 'AI Intelligence', roles: [ROLES.ADMIN, ROLES.DOCTOR] },
+  ]},
+  { section: 'Finance', items: [
+    { to: '/billing', icon: Receipt, label: 'Billing', roles: [ROLES.ADMIN, ROLES.RECEPTIONIST] },
+  ]},
+  { section: 'System', items: [
+    { to: '/settings', icon: Settings, label: 'Settings' },
+    { to: '/audit-log', icon: Shield, label: 'Audit Log', roles: [ROLES.ADMIN] },
+  ]},
 ];
 
 const breadcrumbMap = {
@@ -77,7 +83,23 @@ export default function Layout() {
     SYSTEM: '🔔',
   };
 
-  const filteredNavItems = navItems.filter(item => !item.adminOnly || user?.role === 'ADMIN');
+  const roleInfo = getRoleInfo(user?.role);
+
+  // Filter navigation items by role and hide empty sections
+  const filteredNavItems = navItems.reduce((acc, entry) => {
+    if (entry.to) {
+      if (!entry.roles || hasRole(user, entry.roles)) {
+        acc.push(entry);
+      }
+    } else if (entry.section && Array.isArray(entry.items)) {
+      const visibleSubItems = entry.items.filter(item => !item.roles || hasRole(user, item.roles));
+      if (visibleSubItems.length > 0) {
+        acc.push({ section: entry.section });
+        acc.push(...visibleSubItems);
+      }
+    }
+    return acc;
+  }, []);
 
   return (
     <div className="app-layout">
@@ -95,7 +117,7 @@ export default function Layout() {
         <nav className="sidebar-nav">
           {filteredNavItems.map((item, i) =>
             item.section ? (
-              !collapsed && <div key={i} className="sidebar-section">{item.section}</div>
+              !collapsed && <div key={`sec-${i}`} className="sidebar-section">{item.section}</div>
             ) : (
               <NavLink
                 key={item.to}
@@ -214,12 +236,24 @@ export default function Layout() {
               )}
             </div>
 
-            {/* User Profile */}
-            <div className="header-user" onClick={() => navigate('/settings')}>
-              <div className="header-user-avatar">{getInitials(user?.name)}</div>
+            {/* User Profile & Role Info */}
+            <div className="header-user" onClick={() => navigate('/settings')} title={`Signed in as ${user?.name} (${roleInfo.fullName})`}>
+              <div className="header-user-avatar" style={{ border: `2px solid ${roleInfo.color}` }}>
+                {getInitials(user?.name)}
+              </div>
               <div className="header-user-info">
                 <div className="header-user-name">{user?.name}</div>
-                <div className="header-user-role">{user?.role}</div>
+                <div className="header-user-role" style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  color: roleInfo.color,
+                  fontWeight: 700,
+                  fontSize: 11,
+                }}>
+                  <span>{roleInfo.icon}</span>
+                  <span>{roleInfo.label}</span>
+                </div>
               </div>
             </div>
           </div>
